@@ -1,0 +1,6 @@
+*.o
+*.iso
+*.img
+myos
+isodir
+usbdir
