@@ -33,7 +33,8 @@
 #include "str.h"
 #include "serial.h"
 
-void serial_enable(int port) {
+void serial_enable(
+	int port) {
 	outb(port + 1, 0x00);
 	outb(port + 3, 0x80);
 	outb(port + 0, 0x03);
@@ -43,34 +44,45 @@ void serial_enable(int port) {
 	outb(port + 4, 0x0B);
 }
 
-int serial_rcvd(int port) {
+int serial_rcvd(
+	int port) {
 	return inb(port + 5) & 1;
 }
 
-char serial_recv(int port) {
+char serial_recv(
+	int port) {
 	while (serial_rcvd(port) == 0) ;
 	return inb(port);
 }
 
-char serial_recv_async(int port) {
+char serial_recv_async(
+	int port) {
 	return inb(port);
 }
 
-int serial_transmit_empty(int port) {
+int serial_transmit_empty(
+	int port) {
 	return inb(port + 5) & 0x20;
 }
 
-void serial_send(int port, char c) {
+void serial_send(
+	int port,
+	char c) {
 	while (serial_transmit_empty(port) == 0);
 	outb(port, c);
 }
 
-void serial_write(int port, const char *data, uint32_t length) {
+void serial_write(
+	int port,
+	const char *data,
+	uint32_t length) {
 	for (uint32_t i = 0; i < length; ++i) {
 		serial_send(port, data[i]);
 	}
 }
 
-void serial_writestring(int port, const char *data) {
+void serial_writestring(
+	int port,
+	const char *data) {
     serial_write(port, data, str_len(data));
 }

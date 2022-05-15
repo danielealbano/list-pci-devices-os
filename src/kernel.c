@@ -36,20 +36,22 @@
 #include "console.h"
 #include "pci.h"
 
-void kernel_serial_initialize(void) {
-	serial_enable(SERIAL_PORT_A);
+#define KERNEL_CONSOLE_SERIAL_PORT SERIAL_PORT_A
+
+void kernel_serial_initialize() {
+	serial_enable(KERNEL_CONSOLE_SERIAL_PORT);
+    console_set_serial_port(KERNEL_CONSOLE_SERIAL_PORT);
 }
  
-void kernel_terminal_initialize(void)  {
+void kernel_terminal_initialize()  {
     terminal_initialize();
 }
 
-void kernel_main(void) {
+void kernel_main() {
 	kernel_terminal_initialize();
 
     terminal_writestring("INITIALIZING SERIAL PORT 0");
 	kernel_serial_initialize();
-    console_set_serial_port(SERIAL_PORT_A);
  
 	console_writestring("SCANNING PCI BUS...\n");
 

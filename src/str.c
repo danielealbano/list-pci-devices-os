@@ -31,7 +31,8 @@
 
 #include "str.h"
 
-size_t str_len(const char* str) {
+size_t str_len(
+    const char* str) {
 	size_t len = 0;
 	while (str[len]) {
 		len++;
@@ -39,7 +40,8 @@ size_t str_len(const char* str) {
 	return len;
 }
 
-unsigned str_uint64_to_decstr_len(uint64_t number) {
+unsigned str_uint64_to_decstr_len(
+    uint64_t number) {
     static uint8_t maxdigits[65] = {
             1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 6, 6, 6,
             7, 7, 7, 7, 8, 8, 8, 9, 9, 9, 10, 10, 10, 10, 11, 11, 11,
@@ -69,7 +71,11 @@ unsigned str_uint64_to_decstr_len(uint64_t number) {
     return digits;
 }
 
-char* str_uint64_to_decstr(uint64_t number, char* buffer, size_t buffer_length, unsigned *number_length) {
+char* str_uint64_to_decstr(
+    uint64_t number,
+    char* buffer,
+    size_t buffer_length,
+    unsigned *number_length) {
     unsigned number_str_length;
     number_str_length = *number_length = str_uint64_to_decstr_len(number);
 
@@ -92,7 +98,11 @@ char* str_uint64_to_decstr(uint64_t number, char* buffer, size_t buffer_length, 
     return buffer;
 }
 
-char* str_uint64_to_hexstr(uint64_t number, uint8_t length, char* buffer, size_t buffer_length) {
+char* str_uint64_to_hexstr(
+    uint64_t number,
+    uint8_t length,
+    char* buffer,
+    size_t buffer_length) {
     if (length == 0) {
         return NULL;
     }

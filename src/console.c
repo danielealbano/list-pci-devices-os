@@ -34,11 +34,13 @@
 
 int console_serial_port = 0;
 
-void console_writestring(const char* data) {
+void console_writestring(
+    const char* data) {
     terminal_writestring(data);
     serial_writestring(console_serial_port, data);
 }
 
-void console_set_serial_port(int port) {
+void console_set_serial_port(
+    int port) {
     console_serial_port = port;
 }
