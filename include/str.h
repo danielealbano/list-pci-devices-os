@@ -10,7 +10,7 @@ char* str_uint64_to_decstr(
     size_t buffer_length,
     unsigned *number_length);
 
-char* str_uint64_to_dechex(
+char* str_uint64_to_hexstr(
     uint64_t number,
     uint8_t length,
     char* buffer,
