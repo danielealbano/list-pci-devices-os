@@ -1,10 +1,11 @@
 CFLAGS=-ffreestanding -O2 -Wall -Wextra
 LDFLAGS=-ffreestanding -O2 -nostdlib -lgcc
 TARGET=build/myos
-OBJ_DIR=objs
+SRC_DIR=src
+OBJ_DIR=obj
 
-SRCS=$(wildcard *.c)
-OBJS=$(SRCS:%.c=$(OBJ_DIR)/%.o)
+SRCS=$(wildcard $(SRC_DIR)/*.c)
+OBJS=$(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRCS))
 
 all: $(TARGET)
 
@@ -12,10 +13,10 @@ $(OBJ_DIR):
 	mkdir $(OBJ_DIR) || true
 
 $(OBJ_DIR)/boot.o: $(OBJ_DIR)
-	as -32 boot.S -o $(OBJ_DIR)/boot.o
+	as -32 src/boot.S -o $(OBJ_DIR)/boot.o
 
-$(OBJ_DIR)/%.o: %.c
-	gcc -m32 -o $@ -c $^ -std=gnu99 $(CFLAGS)
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	gcc -m32 -o $@ -c $^ -std=gnu99 -I include $(CFLAGS)
 
 $(TARGET): $(BUILD_DIR) $(OBJ_DIR)/boot.o $(OBJS)
 	(mkdir $(shell dirname $(TARGET)) || true) 2>/dev/null
