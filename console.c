@@ -29,31 +29,16 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "inout.h"
-#include "str.h"
-#include "terminal.h"
 #include "serial.h"
-#include "console.h"
-#include "pci.h"
+#include "terminal.h"
 
-void kernel_serial_initialize(void) {
-	serial_enable(SERIAL_PORT_A);
-}
- 
-void kernel_terminal_initialize(void)  {
-    terminal_initialize();
+int console_serial_port = 0;
+
+void console_writestring(const char* data) {
+    terminal_writestring(data);
+    serial_writestring(console_serial_port, data);
 }
 
-void kernel_main(void) {
-	kernel_terminal_initialize();
-
-    terminal_writestring("INITIALIZING SERIAL PORT 0");
-	kernel_serial_initialize();
-    console_set_serial_port(SERIAL_PORT_A);
- 
-	console_writestring("SCANNING PCI BUS...\n");
-
-    pci_check_all_buses();
-    
-	console_writestring("SCAN COMPLETED\n");
+void console_set_serial_port(int port) {
+    console_serial_port = port;
 }

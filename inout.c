@@ -26,34 +26,30 @@
 // handle the serial port from
 // https://github.com/stevej/osdev/blob/master/kernel/devices/serial.c
 
-#include <stddef.h>
 #include <stdint.h>
 
-#include "inout.h"
-#include "str.h"
-#include "terminal.h"
-#include "serial.h"
-#include "console.h"
-#include "pci.h"
+#include "stdint.h"
 
-void kernel_serial_initialize(void) {
-	serial_enable(SERIAL_PORT_A);
-}
- 
-void kernel_terminal_initialize(void)  {
-    terminal_initialize();
+void outb(uint16_t port, uint8_t data) {
+    asm volatile ("outb %1, %0" : : "dN" (port), "a" (data));
 }
 
-void kernel_main(void) {
-	kernel_terminal_initialize();
+void outw(uint16_t port, uint16_t data) {
+    asm volatile ("outw %1, %0" : : "dN" (port), "a" (data));
+}
 
-    terminal_writestring("INITIALIZING SERIAL PORT 0");
-	kernel_serial_initialize();
-    console_set_serial_port(SERIAL_PORT_A);
- 
-	console_writestring("SCANNING PCI BUS...\n");
+void outl(uint16_t port, uint32_t data) {
+    asm volatile ("outl %1, %0" : : "dN" (port), "a" (data));
+}
 
-    pci_check_all_buses();
-    
-	console_writestring("SCAN COMPLETED\n");
+uint8_t inb(uint16_t port) {
+    uint8_t ret;
+    asm volatile ("inb %1, %0" : "=a" (ret) : "dN" (port));
+    return ret;
+}
+
+uint32_t inl(uint16_t port) {
+    uint32_t ret;
+    asm volatile ("inl %1, %0" : "=a" (ret) : "dN" (port));
+    return ret;
 }

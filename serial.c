@@ -31,29 +31,46 @@
 
 #include "inout.h"
 #include "str.h"
-#include "terminal.h"
 #include "serial.h"
-#include "console.h"
-#include "pci.h"
 
-void kernel_serial_initialize(void) {
-	serial_enable(SERIAL_PORT_A);
+void serial_enable(int port) {
+	outb(port + 1, 0x00);
+	outb(port + 3, 0x80);
+	outb(port + 0, 0x03);
+	outb(port + 1, 0x00);
+	outb(port + 3, 0x03);
+	outb(port + 2, 0xC7);
+	outb(port + 4, 0x0B);
 }
- 
-void kernel_terminal_initialize(void)  {
-    terminal_initialize();
+
+int serial_rcvd(int port) {
+	return inb(port + 5) & 1;
 }
 
-void kernel_main(void) {
-	kernel_terminal_initialize();
+char serial_recv(int port) {
+	while (serial_rcvd(port) == 0) ;
+	return inb(port);
+}
 
-    terminal_writestring("INITIALIZING SERIAL PORT 0");
-	kernel_serial_initialize();
-    console_set_serial_port(SERIAL_PORT_A);
- 
-	console_writestring("SCANNING PCI BUS...\n");
+char serial_recv_async(int port) {
+	return inb(port);
+}
 
-    pci_check_all_buses();
-    
-	console_writestring("SCAN COMPLETED\n");
+int serial_transmit_empty(int port) {
+	return inb(port + 5) & 0x20;
+}
+
+void serial_send(int port, char c) {
+	while (serial_transmit_empty(port) == 0);
+	outb(port, c);
+}
+
+void serial_write(int port, const char *data, uint32_t length) {
+	for (uint32_t i = 0; i < length; ++i) {
+		serial_send(port, data[i]);
+	}
+}
+
+void serial_writestring(int port, const char *data) {
+    serial_write(port, data, strlen(data));
 }
