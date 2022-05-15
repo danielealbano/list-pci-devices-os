@@ -1,32 +1,37 @@
 CFLAGS=-ffreestanding -O2 -Wall -Wextra
 LDFLAGS=-ffreestanding -O2 -nostdlib -lgcc
-TARGET=myos
+TARGET=build/myos
+OBJ_DIR=objs
 
 SRCS=$(wildcard *.c)
-OBJS=$(SRCS:.c=.o)
+OBJS=$(SRCS:%.c=$(OBJ_DIR)/%.o)
 
 all: $(TARGET)
 
-boot.o: 
-	as -32 boot.S -o boot.o
+$(OBJ_DIR):
+	mkdir $(OBJ_DIR) || true
 
-%.o: %.c
+$(OBJ_DIR)/boot.o: $(OBJ_DIR)
+	as -32 boot.S -o $(OBJ_DIR)/boot.o
+
+$(OBJ_DIR)/%.o: %.c
 	gcc -m32 -o $@ -c $^ -std=gnu99 $(CFLAGS)
 
-$(TARGET): boot.o $(OBJS)
-	gcc -m32 -T linker.ld -o $(TARGET) boot.o $(OBJS) $(LDFLAGS)
+$(TARGET): $(BUILD_DIR) $(OBJ_DIR)/boot.o $(OBJS)
+	(mkdir $(shell dirname $(TARGET)) || true) 2>/dev/null
+	gcc -m32 -T linker.ld -o $(TARGET) $(OBJ_DIR)/boot.o $(OBJS) $(LDFLAGS)
 
 $(TARGET).iso: $(TARGET) .phony
-	mkdir isodir || true
-	mkdir isodir/boot || true
-	cp $(TARGET) isodir/boot
-	grub-mkrescue -o $(TARGET).iso isodir
+	mkdir $(BUILD_DIR)isodir || true
+	mkdir $(BUILD_DIR)isodir/boot || true
+	cp $(TARGET) $(BUILD_DIR)isodir/boot
+	grub-mkrescue -o $(TARGET).iso $(BUILD_DIR)isodir
 
 $(TARGET).img: $(TARGET) .phony
 	mkdir usbdir || true
 	dd if=/dev/zero of=$(TARGET).img bs=20M count=1
 	$(eval LOOPDEV=$(shell losetup -f))
-	$(eval USBDIR=$(realpath usbdir))
+	$(eval USBDIR=$(realpath $(BUILD_DIR)/usbdir))
 	sudo losetup $(LOOPDEV) $(TARGET).img
 	sudo mkfs.vfat $(LOOPDEV) -v
 	sudo mount -t vfat $(LOOPDEV) $(USBDIR)
@@ -47,6 +52,6 @@ qemu: $(TARGET)
 	qemu-system-i386 -M q35 -kernel $(TARGET) -serial stdio
 
 clean:
-	rm $(OBJS) $(TARGET) $(TARGET).iso $(TARGET).img || true
+	rm $(OBJ_DIR)/boot.o $(OBJS) $(TARGET) $(TARGET).iso $(TARGET).img || true
 
 .phony:
