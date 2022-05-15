@@ -1,4 +1,4 @@
-size_t strlen(
+size_t str_len(
     const char* str);
 
 unsigned str_uint64_to_decstr_len(

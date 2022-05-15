@@ -72,5 +72,5 @@ void serial_write(int port, const char *data, uint32_t length) {
 }
 
 void serial_writestring(int port, const char *data) {
-    serial_write(port, data, strlen(data));
+    serial_write(port, data, str_len(data));
 }
